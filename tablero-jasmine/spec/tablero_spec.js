@@ -1,16 +1,20 @@
 describe("Tablero",function(){
 
 	var tab; 
-
+     var juego;
+     var usr;
 	beforeEach(function(){
 		tab = new Tablero(40);
-		
+		juego = new Juego();
+          usr = new Jugador('pepe',1000);
 	});
 
 	describe("Tablero",function(){
 		it("Tiene 40 casillas",function(){
-			expect(tab.numeroCasillas).toBeDefined(); //debe existir la variable
+               
+			expect(tab.dado.calcularNumero()).toBeDefined(); //debe existir la variable
 			expect(tab.numeroCasillas).toEqual(40);	 //debe tener valor inicial 0
+
 		});
 		it("Estan las calles en el tablero",function(){
 		  expect(tab.casillas[0].obtenerTema) instanceof Salida	
@@ -121,8 +125,31 @@ describe("Tablero",function(){
 		});
 
 		it("Comprobar numero dado",function(){
-		  expect(tab.dado.calcularNumero())<=6;
+            var valor
+             
+
+            
+            for(i=0;i<100;i++){
+            valor=tab.dado.calcularNumero();
+
+		  expect(valor).toBeLessThan(6);
+            expect(valor).toBeGreaterThan(2);
+
+            valor=valor+tab.dado.calcularNumero();
+            expect(valor).toBeLessThan(13);
+            expect(valor).toBeGreaterThan(2);
+            }
 		});
+
+           it("Agregar nuevo usuario",function(){
+               juego.iniJuego();
+               juego.nuevoUsuario(usr);
+
+               expect(juego.buscarJugador('pepe').obtenerUsuario().nombre).toEqual('pepe');
+              
+
+          });
+
 		/*it("Debería restar cualquier serie de números",function(){
 			expect(tab.obtenerCasilla(calle)).toBeDefined());
 		});*/
@@ -138,13 +165,9 @@ describe("Tablero",function(){
 
 	});
 
-	/*describe("Existe la calle ",function(calle){
-		it("Debería restar cualquier serie de números",function(calle){
-			expect(tab.obtenerCasilla(calle)).toBeDefined());
-		});
-	});
 
-	it("debería resetear el valor de la calculadora",function(){
+
+	/*it("debería resetear el valor de la calculadora",function(){
 		cal.actual=20;
 		cal.reset();
 		expect(cal.actual).toEqual(0);

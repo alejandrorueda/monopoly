@@ -1,3 +1,46 @@
+
+function Juego(){
+   this.numeroFichasUtilizadas=0
+   this.dado = new Dado()
+   this.fichas=[]
+   this.tablero=null
+   
+   this.iniJuego=function(){
+     this.tablero=new Tablero(40)
+     this.iniciarFichas()
+  
+   }
+   this.buscarJugador=function(nombre){
+      for(i=0;i<this.numeroFichasUtilizadas;i++){
+             if(this.fichas[i].obtenerUsuario().nombre==nombre)return this.fichas[i]
+       }
+
+   }
+   this.agregarFicha=function(usuario){
+     if(this.numeroFichasUtilizadas<6){
+      
+     this.fichas[this.numeroFichasUtilizadas].agregarUsuario(usuario)
+     this.numeroFichasUtilizadas++
+     return 'Usuario asignado correctamente a la ficha '+this.fichas[this.numeroFichasUtilizadas].nombre
+   }
+   else return 'Ya estan todas las fichas asignadas'
+
+     
+   }
+   this.nuevoUsuario=function(usuario){
+     return this.agregarFicha(usuario)
+
+   }
+   this.iniciarFichas=function(){
+       this.fichas[0]=new Ficha('amarillo')
+       this.fichas[1]=new Ficha('azul')
+       this.fichas[2]=new Ficha('rojo')
+       this.fichas[3]=new Ficha('verde')
+       this.fichas[4]=new Ficha('morado')
+       this.fichas[5]=new Ficha('marron')
+   }
+
+}
 function Tablero(numeroCasillas){
 	this.casillas=[]
   this.dado = new Dado()
@@ -80,7 +123,7 @@ function Casilla(posicion,tema){
     }
     this.quitarJugador=function(jugador){
       for(i=0;i<this.nJugadores;i++){
-                 if(jugador.nombre)==this.jugadores[this.nJugadores].nombre) return this.casillas[i]
+                 if((jugador.nombre)==this.jugadores[this.nJugadores].nombre) return this.casillas[i]
           }
     }
 
@@ -102,14 +145,7 @@ function Tarjeta(nombre,descripcion){
       this.descripcion=descripcion
 } 
 
-function Jugador(nombre,ficha){
-      this.nombre=nombre
-      this.ficha=ficha
 
-      this.caer=function(casilla){
-          casilla.agregarJugador(this)
-      }
-}
 function casillaTarjeta(nombre){
      this.nombre=nombre
 }
@@ -137,15 +173,21 @@ function Tarjetas(){
 }
 function Dado(){
      this.calcularNumero=function(){
-        return Math.round(Math.random()*6);
+        return Math.round(Math.random()*6+0);
      }
 }
 function Ficha(nombre){
        this.nombre=nombre
+       this.usuario=null
+       
+       this.agregarUsuario=function(usuario){
+           this.usuario=usuario
+       }
+        this.obtenerUsuario=function(){
+           return this.usuario
+       }
 }
-function Juego(){
-     
-}
+
 function Jugador(nombre,presupuesto){
      this.presupuesto=presupuesto
      this.nombre=nombre
@@ -212,7 +254,8 @@ function Carcel(nombre){
 	this.nombre=nombre
 }
 
-function iniJuego(){
-	tablero = new Tablero(40)
 
-}
+   function iniJuego(){
+     tab =new Tablero(40)
+  
+   }
