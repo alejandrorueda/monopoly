@@ -9,6 +9,10 @@ function Juego(){
     return this.dado
   
    }
+   this.obtenerTablero=function(){
+    return this.tablero
+  
+   }
 
    this.iniJuego=function(){
     this.tablero=(new CrearTablero).crearObjeto()
@@ -20,14 +24,16 @@ function Juego(){
       for(i=0;i<this.numeroFichasUtilizadas;i++){
              if(this.fichas[i].obtenerUsuario().nombre==nombre)return this.fichas[i]
        }
+     return -1
 
    }
    this.agregarFicha=function(usuario){
      if(this.numeroFichasUtilizadas<6){
       
      this.fichas[this.numeroFichasUtilizadas].agregarUsuario(usuario)
+     this.fichas[this.numeroFichasUtilizadas].asignarCasilla(this.tablero.casillas[0])
      this.numeroFichasUtilizadas++
-     return 'Usuario asignado correctamente a la ficha '+this.fichas[this.numeroFichasUtilizadas].nombre
+     return 'Usuario asignado correctamente a la ficha '+this.fichas[this.numeroFichasUtilizadas-1].nombre
    }
    else return 'Ya estan todas las fichas asignadas'
 
@@ -191,12 +197,18 @@ function Dado(){
 function Ficha(nombre){
        this.nombre=nombre
        this.usuario=null
-       
+       this.casilla=new Salida()
+       this.presupuesto=0
        this.agregarUsuario=function(usuario){
            this.usuario=usuario
+           this.presupuesto=this.usuario.presupuesto
        }
+
         this.obtenerUsuario=function(){
            return this.usuario
+       }
+       this.asignarCasilla=function(casilla){
+           this.casilla=casilla
        }
 }
 
@@ -205,13 +217,54 @@ function Jugador(nombre,presupuesto,juego){
      this.nombre=nombre
      this.juego=juego
      this.posicion=0
-     this.casilla=new Salida()
+     this.volverTirar=0
+     
 
-     this.lanzarDado=function(){
+     this.lanzarDosDados=function(){
         var numero=juego.obtenerDado().calcularNumero()
-        this.posicion+=numero
-        return this.posicion 
+        var numero2=juego.obtenerDado().calcularNumero()
+
+      if(this.volverTirar>0){
+        this.posicion=this.posicion+numero+numero2
+        if(this.posicion>=40)this.posicion=this.posicion-40
+        juego.buscarJugador(this.nombre).asignarCasilla(juego.obtenerTablero().casillas[this.posicion])
+
+        if((numero+numero2)==12)this.volverTirar++;
+        else this.volverTirar=0;
+
+        if(this.volverTirar==3){
+         
+            juego.buscarJugador(this.nombre).asignarCasilla(juego.obtenerTablero().casillas[30])
+            this.volverTirar=0
+        }
+
+        return numero+numero2 
+    }
+        return 'No se puede tirar' 
      }
+
+       this.lanzarDosDadosManual=function(numero,numero2){
+        
+
+      if(this.volverTirar>0){
+        this.posicion=this.posicion+numero+numero2
+        if(this.posicion>=40)this.posicion=this.posicion-40
+        juego.buscarJugador(this.nombre).asignarCasilla(juego.obtenerTablero().casillas[this.posicion])
+
+        if((numero+numero2)==12)this.volverTirar++;
+        else this.volverTirar=0;
+
+        if(this.volverTirar==4){
+         
+            juego.buscarJugador(this.nombre).asignarCasilla(juego.obtenerTablero().casillas[30])
+            this.volverTirar=0
+        }
+
+        return numero+numero2 
+    }
+        return 'No se puede tirar' 
+     }
+     
 
 }
 function Propiedad(tipo,propietario,aumentoPrecio){

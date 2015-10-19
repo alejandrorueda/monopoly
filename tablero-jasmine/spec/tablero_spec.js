@@ -124,6 +124,8 @@ describe("Tablero",function(){
           tab = new Tablero(40);
 		});
 
+   
+
 		it("Comprobar numero dado",function(){
             var valor
              
@@ -147,6 +149,136 @@ describe("Tablero",function(){
 
                expect(juego.buscarJugador('pepe').obtenerUsuario().nombre).toEqual('pepe');
               
+
+          });
+
+           it("6 jugadores con sus respectivas fichas",function(){
+               juego.iniJuego();
+            for(i=0;i<6;i++){
+
+               juego.crearUsuario('usuario'+i);
+
+            }
+
+            expect(juego.crearUsuario('usuario7')).toEqual('Ya estan todas las fichas asignadas');
+            var colores=' ';
+            for(i=0;i<6;i++){
+               var ficha;
+
+               ficha = juego.buscarJugador('usuario'+i);
+               if(ficha!=-1){
+               expect(ficha.obtenerUsuario().nombre).toEqual('usuario'+i);
+               expect(colores.indexOf(ficha.nombre)).toEqual(-1);
+               colores=colores+' '+ficha.nombre;
+               expect(juego.buscarJugador('usuario'+i).presupuesto).toEqual(150000);
+               }
+               else expect(0).toEqual(-1);
+            }
+
+
+          });
+
+           it("Lanzar los dos dados",function(){
+               juego.iniJuego();
+
+               juego.crearUsuario('usuario');
+               var numeroDado;
+               
+              juego.buscarJugador('usuario').usuario.volverTirar=1;
+               numeroDado=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDados();
+               expect(numeroDado).toBeGreaterThan(1);
+               expect(numeroDado).toBeLessThan(13);
+             
+
+          });
+
+             it("Se modifica la posicion",function(){
+               juego.iniJuego();
+
+               juego.crearUsuario('usuario');
+               var posicion,numeroDado,nuevaCasilla,total;
+               juego.buscarJugador('usuario').usuario.volverTirar=1;
+               posicion=juego.buscarJugador('usuario').casilla.posicion;
+               numeroDado=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDados();
+               total=posicion+numeroDado;
+               expect(juego.buscarJugador('usuario').casilla.posicion).toEqual(total);
+             
+
+          });
+
+          it("Limites del tablero",function(){
+               juego.iniJuego();
+
+               juego.crearUsuario('usuario');
+               var posicion=0,numeroDado,nuevaCasilla,total;
+               
+               for(k=0;k<40;k++){
+               juego.buscarJugador('usuario').usuario.volverTirar=1;
+                 juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDados();
+
+                 if(posicion==juego.buscarJugador('usuario').casilla.posicion)expect(0).toEqual(-1);
+
+                 posicion = juego.buscarJugador('usuario').casilla.posicion;
+                 expect(posicion).toBeLessThan(40);
+                 expect(posicion).toBeGreaterThan(-1);
+               }
+
+          });
+
+           it("Doble",function(){
+               juego.iniJuego();
+
+               juego.crearUsuario('usuario');
+               var posicion=0,numeroDado,nuevaCasilla,total;
+               
+               
+                 juego.buscarJugador('usuario').usuario.volverTirar=1;
+
+                 posicion=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDadosManual(6,6);
+
+                 expect(posicion).toEqual(12);
+
+                  posicion=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDadosManual(6,1);
+
+                 expect(posicion).toEqual(7);
+
+                  posicion=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDados();
+
+                 expect(posicion).toEqual('No se puede tirar');
+
+               
+
+
+          });
+
+            it(" Tres Dobles",function(){
+               juego.iniJuego();
+
+               juego.crearUsuario('usuario');
+               var posicion=0,numeroDado,nuevaCasilla,total;
+               
+               
+                 juego.buscarJugador('usuario').usuario.volverTirar=1;
+
+                 posicion=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDadosManual(6,6);
+
+                 expect(posicion).toEqual(12);
+
+                  posicion=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDadosManual(6,6);
+
+                 expect(posicion).toEqual(12);
+
+                 posicion=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDadosManual(6,6);
+
+                 expect(posicion).toEqual(12);
+
+                 expect(juego.buscarJugador('usuario').casilla.tema.nombre).toEqual('Carcel');
+
+                  posicion=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDados();
+
+                 expect(posicion).toEqual('No se puede tirar');
+               
+
 
           });
 
