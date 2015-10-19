@@ -5,8 +5,14 @@ function Juego(){
    this.fichas=[]
    this.tablero=null
    
+   this.obtenerDado=function(){
+    return this.dado
+  
+   }
+
    this.iniJuego=function(){
-     this.tablero=new Tablero(40)
+    this.tablero=(new CrearTablero).crearObjeto()
+    // this.tablero=new Tablero(40)
      this.iniciarFichas()
   
    }
@@ -31,6 +37,10 @@ function Juego(){
      return this.agregarFicha(usuario)
 
    }
+    this.crearUsuario=function(usuarioNombre){
+     return  this.agregarFicha((new CrearJugador).crearObjeto(usuarioNombre,this))
+
+   }
    this.iniciarFichas=function(){
        this.fichas[0]=new Ficha('amarillo')
        this.fichas[1]=new Ficha('azul')
@@ -41,6 +51,7 @@ function Juego(){
    }
 
 }
+
 function Tablero(numeroCasillas){
 	this.casillas=[]
   this.dado = new Dado()
@@ -53,7 +64,7 @@ function Tablero(numeroCasillas){
        for(i=0;i<numeroCasillas;i++){
        	     this.casillas[i]=new Casilla(i,new Normal())
        }
-
+    this.agregarCasilla(0,new Casilla(0,new Salida()))
     this.agregarCasilla(1,new Casilla(1,new Calle('Ronda de Valencia',60,'marron',1)))
     this.agregarCasilla(2,new Casilla(2,new casillaTarjeta('comunidad')))
     this.agregarCasilla(3,new Casilla(3,new Calle('Plaza Lavapies',60,'marron',3)))
@@ -105,6 +116,7 @@ function Tablero(numeroCasillas){
     
 
 	this.iniciarTablero()
+
 
 }
 
@@ -173,7 +185,7 @@ function Tarjetas(){
 }
 function Dado(){
      this.calcularNumero=function(){
-        return Math.round(Math.random()*6+0);
+        return Math.round(Math.random()*6+1);
      }
 }
 function Ficha(nombre){
@@ -188,9 +200,18 @@ function Ficha(nombre){
        }
 }
 
-function Jugador(nombre,presupuesto){
+function Jugador(nombre,presupuesto,juego){
      this.presupuesto=presupuesto
      this.nombre=nombre
+     this.juego=juego
+     this.posicion=0
+     this.casilla=new Salida()
+
+     this.lanzarDado=function(){
+        var numero=juego.obtenerDado().calcularNumero()
+        this.posicion+=numero
+        return this.posicion 
+     }
 
 }
 function Propiedad(tipo,propietario,aumentoPrecio){
@@ -259,3 +280,27 @@ function Carcel(nombre){
      tab =new Tablero(40)
   
    }
+function Creator(){
+
+   function crearObjeto(){}
+}
+function CrearTablero(){}
+
+CrearTablero.prototype = new Creator;
+CrearTablero.prototype.crearObjeto = function() {
+  return new Tablero(40)
+}
+
+function CrearJuego(){}
+
+CrearJuego.prototype = new Creator;
+CrearJuego.prototype.crearObjeto = function() {
+  return new Juego()
+}
+
+function CrearJugador(){}
+
+CrearJugador.prototype = new Creator;
+CrearJugador.prototype.crearObjeto = function(nombre,juego) {
+  return new Jugador(nombre,150000,juego)
+}
