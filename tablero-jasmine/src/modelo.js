@@ -194,21 +194,39 @@ function Dado(){
         return Math.round(Math.random()*6+1);
      }
 }
+
 function Ficha(nombre){
        this.nombre=nombre
        this.usuario=null
        this.casilla=new Salida()
        this.presupuesto=0
+       this.propiedades=[]
+       this.numeroPropiedades=0
+
+       this.agregarPropiedad=function(propiedad){
+            this.propiedades[this.numeroPropiedades]=propiedad
+            this.numeroPropiedades++
+       }
        this.agregarUsuario=function(usuario){
            this.usuario=usuario
            this.presupuesto=this.usuario.presupuesto
+       }
+
+        this.comprarPropiedad=function(precio){
+           
+           this.presupuesto=this.presupesto - precio
        }
 
         this.obtenerUsuario=function(){
            return this.usuario
        }
        this.asignarCasilla=function(casilla){
+          //document.writeln('asignada')
+           //document.writeln('El usuario '+this.usuario.nombre+' ha caido en la casilla '+casilla.tema.nombre)
            this.casilla=casilla
+          if(casilla.tema instanceof Calle) casilla.tema.estado.accion
+
+         // return'El usuario '+this.usuario.nombre+' ha caido en la casilla '+casilla.tema.nombre   
        }
 }
 
@@ -217,13 +235,25 @@ function Jugador(nombre,presupuesto,juego){
      this.nombre=nombre
      this.juego=juego
      this.posicion=0
-     this.volverTirar=0
+     this.volverTirar=1
      
+    
+    this.comprarPropiedad=function(){
+        var ficha = juego.buscarJugador(this.nombre);
+
+        ficha.casilla.tema.estado.comprar(ficha,ficha.casilla.tema)
+             
+             return ficha.casilla.tema.nombre+" ha sido comprado"         
+        }
+
+
+        
+    
 
      this.lanzarDosDados=function(){
         var numero=juego.obtenerDado().calcularNumero()
         var numero2=juego.obtenerDado().calcularNumero()
-
+      this.volverTirar=1
       if(this.volverTirar>0){
         this.posicion=this.posicion+numero+numero2
         if(this.posicion>=40)this.posicion=this.posicion-40
@@ -237,7 +267,7 @@ function Jugador(nombre,presupuesto,juego){
             juego.buscarJugador(this.nombre).asignarCasilla(juego.obtenerTablero().casillas[30])
             this.volverTirar=0
         }
-
+        
         return numero+numero2 
     }
         return 'No se puede tirar' 
@@ -289,6 +319,7 @@ function Estacion(nombre,precio){
     this.nombre = nombre
   this.precio = precio
   this.propietario = new Jugador("nadie",0)
+  this.titulo = new Titulo(precio)
    this.agregarPropietario=function(propietario){
       this.propietario = propietario
   }
@@ -305,6 +336,9 @@ function Calle(nombre,precio,color,posicion){
 	this.colorr = color
   this.propiedades = []
   this.propietario = new Jugador("nadie",0)
+  this.titulo=new Titulo(this.precio)
+  this.estado=new Libre()
+
   this.agregarPropiedad=function(propiedad){
       this.propiedades[this.contadorPropiedades]=propiedad
       this.contadorPropiedades++;
@@ -357,3 +391,42 @@ CrearJugador.prototype = new Creator;
 CrearJugador.prototype.crearObjeto = function(nombre,juego) {
   return new Jugador(nombre,150000,juego)
 }
+
+function Titulo(precioCompra){
+     this.precioCompra=precioCompra
+     this.precioAlquiler=this.precioCompra/2
+
+}
+
+function Estado(){
+   
+   this.comprar=function(){}
+   this.functionAlquilar=function(){}
+   this.accion=function(){}
+}
+function Libre(){}
+Libre.prototype = new Estado;
+Libre.prototype.comprar = function(ficha,propiedad) {
+    ficha.agregarPropiedad(propiedad)
+    ficha.comprarPropiedad(propiedad.titulo.precioCompra)
+    propiedad.estado = new APagar()
+}
+APagar.prototype.accion = function(ficha, propiedad) {
+    document.write('El usuario puede comprar esta propiedad')
+}
+
+function APagar(){}
+APagar.prototype = new Estado;
+APagar.prototype.comprar = function() {
+    
+    return 'Esta calle ya tiene propietario'
+}
+APagar.prototype.accion = function(ficha, propiedad) {
+    var pago=ficha.presupuesto-propiedad.titulo.precio
+    if(pago<0)
+    return 'El usuario no tiene dinero para pagar la estancia'
+    else return 'El usuario '+ficha.usuario.nombre+' ha pagado por su estancia en la calle '+propiedad.nombre+' '+pago
+}
+
+function Hipotecado(){}
+Hipotecado.prototype = new Estado;

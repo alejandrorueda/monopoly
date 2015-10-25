@@ -4,6 +4,14 @@
 </head>
 <body>
 	<script src="src/modelo.js"></script>
+    <script>
+    juego = new Juego();
+    juego.iniJuego();
+    juego.crearUsuario('pepe');
+    juego.crearUsuario('jose');
+    usr1 = juego.buscarJugador('pepe');
+    usr2 = juego.buscarJugador('jose');
 
+    </script>
 </body>
 </html>
