@@ -1,4 +1,4 @@
-describe("Tablero",function(){
+describe("Monopoly",function(){
 
 	var tab; 
      var juego;
@@ -155,11 +155,8 @@ describe("Tablero",function(){
            it("6 jugadores con sus respectivas fichas",function(){
                juego.iniJuego();
             for(i=0;i<6;i++){
-
                juego.crearUsuario('usuario'+i);
-
             }
-
             expect(juego.crearUsuario('usuario7')).toEqual('Ya estan todas las fichas asignadas');
             var colores=' ';
             for(i=0;i<6;i++){
@@ -170,7 +167,7 @@ describe("Tablero",function(){
                expect(ficha.obtenerUsuario().nombre).toEqual('usuario'+i);
                expect(colores.indexOf(ficha.nombre)).toEqual(-1);
                colores=colores+' '+ficha.nombre;
-               expect(juego.buscarJugador('usuario'+i).presupuesto).toEqual(150000);
+               expect(juego.buscarJugador('usuario'+i).presupuesto).toEqual(1500);
                }
                else expect(0).toEqual(-1);
             }
@@ -180,14 +177,14 @@ describe("Tablero",function(){
 
            it("Lanzar los dos dados",function(){
                juego.iniJuego();
-
+        
                juego.crearUsuario('usuario');
                var numeroDado;
-               
+              juego.empezar();
               juego.buscarJugador('usuario').usuario.volverTirar=1;
                numeroDado=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDados();
                expect(numeroDado).toBeGreaterThan(1);
-               expect(numeroDado).toBeLessThan(13);
+               expect(numeroDado).toBeLessThan(14);
              
 
           });
@@ -196,6 +193,7 @@ describe("Tablero",function(){
                juego.iniJuego();
 
                juego.crearUsuario('usuario');
+               juego.empezar();
                var posicion,numeroDado,nuevaCasilla,total;
                juego.buscarJugador('usuario').usuario.volverTirar=1;
                posicion=juego.buscarJugador('usuario').casilla.posicion;
@@ -210,6 +208,7 @@ describe("Tablero",function(){
                juego.iniJuego();
 
                juego.crearUsuario('usuario');
+               juego.empezar();
                var posicion=0,numeroDado,nuevaCasilla,total;
                
                for(k=0;k<40;k++){
@@ -230,7 +229,7 @@ describe("Tablero",function(){
 
                juego.crearUsuario('usuario');
                var posicion=0,numeroDado,nuevaCasilla,total;
-               
+               juego.empezar();
                
                  juego.buscarJugador('usuario').usuario.volverTirar=1;
 
@@ -257,7 +256,7 @@ describe("Tablero",function(){
                juego.crearUsuario('usuario');
                var posicion=0,numeroDado,nuevaCasilla,total;
                
-               
+               juego.empezar();
                  juego.buscarJugador('usuario').usuario.volverTirar=1;
 
                  posicion=juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDadosManual(6,6);
@@ -282,6 +281,7 @@ describe("Tablero",function(){
 
           });
 
+
 		/*it("Debería restar cualquier serie de números",function(){
 			expect(tab.obtenerCasilla(calle)).toBeDefined());
 		});*/
@@ -296,6 +296,196 @@ describe("Tablero",function(){
 		});*/
 
 	});
+
+
+
+ it("´Gestion de turnos",function(){
+      var presupuestoInicial,valor;
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        juego.crearUsuario('jose');
+juego.empezar();
+        ficha1 = juego.buscarJugador('pepe');
+        ficha2 = juego.buscarJugador('jose');
+        
+        presupuestoInicial=ficha1.presupuesto;
+
+       valor=ficha1.usuario.lanzarDosDados()
+       expect(valor).toBeGreaterThan(1);
+        do{
+        valor=ficha1.usuario.lanzarDosDados()
+        }while(valor==12);
+        
+   
+        expect(ficha1.usuario.lanzarDosDados()).toEqual('No se puede tirar' );
+
+        valor=ficha2.usuario.lanzarDosDados()
+        expect(valor).toBeGreaterThan(1);
+         do{
+        valor=ficha2.usuario.lanzarDosDados()
+        }while(valor==12);
+
+        expect(ficha2.usuario.lanzarDosDados()).toEqual('No se puede tirar' );
+        expect(ficha1.usuario.lanzarDosDados()).toBeGreaterThan(1);
+
+     })
+
+describe("Funciones calles",function(){
+
+    it("Comprar y alquiler",function(){
+      var presupuestoInicial;
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        juego.crearUsuario('jose');
+
+        ficha1 = juego.buscarJugador('pepe');
+        ficha2 = juego.buscarJugador('jose');
+        
+        presupuestoInicial=ficha1.presupuesto;
+     
+       
+        juego.tablero.casillas[23].tema.estado.accion();
+        ficha1.asignarCasilla(juego.tablero.casillas[23]);
+      
+        juego.tablero.casillas[23].tema.titulo.iniTitulo();
+        ficha1.usuario.comprarPropiedad();
+        expect(ficha1.propiedades[0]).toEqual(juego.tablero.casillas[23].tema);
+        expect(presupuestoInicial-juego.tablero.casillas[23].tema.titulo.precioCompra).toEqual(ficha1.presupuesto);
+
+        if(juego.tablero.casillas[23].tema.estado instanceof APagar)
+        expect(0).toEqual(0);
+        else expect(0).toEqual(-1);
+
+        presupuestoInicial=ficha2.presupuesto;
+        ficha2.asignarCasilla(juego.tablero.casillas[23]);
+        expect(presupuestoInicial-juego.tablero.casillas[23].tema.titulo.precioAlquiler).toEqual(ficha2.presupuesto);
+
+       
+
+     })
+
+   it("Casilla salida 200 pelotis",function(){
+      var presupuestoInicial;
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        juego.crearUsuario('jose');
+
+        ficha1 = juego.buscarJugador('pepe');
+        ficha2 = juego.buscarJugador('jose');
+        
+        presupuestoInicial=ficha1.presupuesto;
+
+        ficha1.asignarCasilla(juego.tablero.casillas[0]);
+      
+        expect(ficha1.presupuesto).toEqual(presupuestoInicial+200)
+
+       
+
+     })
+
+      it("Comprar Estacion",function(){
+      var presupuestoInicial;
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        juego.crearUsuario('jose');
+
+        ficha1 = juego.buscarJugador('pepe');
+        ficha2 = juego.buscarJugador('jose');
+        
+        presupuestoInicial=ficha1.presupuesto;
+     
+       
+        juego.tablero.casillas[5].tema.estado.accion();
+        ficha1.asignarCasilla(juego.tablero.casillas[5]);
+      
+        juego.tablero.casillas[5].tema.titulo.iniTitulo();
+        ficha1.usuario.comprarPropiedad();
+        expect(ficha1.propiedades[0]).toEqual(juego.tablero.casillas[5].tema);
+        expect(presupuestoInicial-juego.tablero.casillas[5].tema.titulo.precioCompra).toEqual(ficha1.presupuesto);
+
+        if(juego.tablero.casillas[5].tema.estado instanceof APagarEstacion)
+        expect(0).toEqual(0);
+        else expect(0).toEqual(-1);
+
+        presupuestoInicial=ficha2.presupuesto;
+        ficha2.asignarCasilla(juego.tablero.casillas[5]);
+        expect(presupuestoInicial-juego.tablero.casillas[5].tema.titulo.precioAlquiler).toEqual(ficha2.presupuesto);
+
+       
+
+     })
+
+    it("Fase del tablero Inicio",function(){
+
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        
+
+        ficha1 = juego.buscarJugador('pepe');
+       
+        expect(ficha1).toBeDefined();
+        juego.empezar();
+
+        expect(juego.crearUsuario('paco')).toEqual(-1);
+
+    })
+
+     it("Fase del tablero Jugar",function(){
+
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        juego.crearUsuario('jose');
+
+        ficha1 = juego.buscarJugador('pepe');
+        expect(ficha1).toBeDefined();
+        expect(ficha1.usuario.lanzarDosDados()).toEqual(-1);
+        juego.empezar();
+        expect(ficha1.usuario.lanzarDosDados()).toBeGreaterThan(1);
+
+
+    })
+
+      it("Comprar todas las propiedades",function(){
+
+        var presupuestoInicial;
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        juego.crearUsuario('jose');
+
+        ficha1 = juego.buscarJugador('pepe');
+        ficha2 = juego.buscarJugador('jose');
+        
+        presupuestoInicial=ficha1.presupuesto;
+   
+       for(i=8;i<9;i++){
+         
+       // juego.tablero.casillas[i].tema.estado.accion();
+     
+        ficha1.asignarCasilla(juego.tablero.casillas[8]);
+      
+        juego.tablero.casillas[8].tema.titulo.iniTitulo();
+        ficha1.usuario.comprarPropiedad();
+         
+      }
+
+      expect(ficha1.numeroPropiedades).toEqual(22);
+       /* expect(ficha1.propiedades[0]).toEqual(juego.tablero.casillas[5].tema);
+        expect(presupuestoInicial-juego.tablero.casillas[5].tema.titulo.precioCompra).toEqual(ficha1.presupuesto);
+
+        if(juego.tablero.casillas[5].tema.estado instanceof APagarEstacion)
+        expect(0).toEqual(0);
+        else expect(0).toEqual(-1);
+
+        presupuestoInicial=ficha2.presupuesto;
+        ficha2.asignarCasilla(juego.tablero.casillas[5]);
+        expect(presupuestoInicial-juego.tablero.casillas[5].tema.titulo.precioAlquiler).toEqual(ficha2.presupuesto);*/
+
+
+
+    })
+   
+   
+})
 
 
 

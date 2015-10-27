@@ -4,6 +4,8 @@ function Juego(){
    this.dado = new Dado()
    this.fichas=[]
    this.tablero=null
+   this.turnoActual=0
+   this.fase=new Inicial()
    
    this.obtenerDado=function(){
     return this.dado
@@ -20,6 +22,10 @@ function Juego(){
      this.iniciarFichas()
   
    }
+   this.empezar=function(){
+     
+         this.fase=new Jugar()
+   }
    this.buscarJugador=function(nombre){
       for(i=0;i<this.numeroFichasUtilizadas;i++){
              if(this.fichas[i].obtenerUsuario().nombre==nombre)return this.fichas[i]
@@ -27,11 +33,22 @@ function Juego(){
      return -1
 
    }
+   this.gestionTurnos=function(){
+
+        this.turnoActual++;
+        if(this.turnoActual>=this.numeroFichasUtilizadas)this.turnoActual=0
+        console.log('turno '+this.turnoActual+' '+this.numeroFichasUtilizadas)
+        this.fichas[this.turnoActual].usuario.volverTirar=1
+          
+   }
+
    this.agregarFicha=function(usuario){
+
      if(this.numeroFichasUtilizadas<6){
       
      this.fichas[this.numeroFichasUtilizadas].agregarUsuario(usuario)
      this.fichas[this.numeroFichasUtilizadas].asignarCasilla(this.tablero.casillas[0])
+     if(this.numeroFichasUtilizadas==0)this.fichas[this.numeroFichasUtilizadas].usuario.volverTirar=1
      this.numeroFichasUtilizadas++
      return 'Usuario asignado correctamente a la ficha '+this.fichas[this.numeroFichasUtilizadas-1].nombre
    }
@@ -40,12 +57,13 @@ function Juego(){
      
    }
    this.nuevoUsuario=function(usuario){
-     return this.agregarFicha(usuario)
+     //return this.agregarFicha(usuario)
+    return this.fase.nuevoUsuario(usuario,this)
 
    }
     this.crearUsuario=function(usuarioNombre){
-     return  this.agregarFicha((new CrearJugador).crearObjeto(usuarioNombre,this))
-
+    // return  this.agregarFicha((new CrearJugador).crearObjeto(usuarioNombre,this))
+    return this.fase.crearUsuario(usuarioNombre,this)
    }
    this.iniciarFichas=function(){
        this.fichas[0]=new Ficha('amarillo')
@@ -210,11 +228,13 @@ function Ficha(nombre){
        this.agregarUsuario=function(usuario){
            this.usuario=usuario
            this.presupuesto=this.usuario.presupuesto
+
        }
 
         this.comprarPropiedad=function(precio){
            
-           this.presupuesto=this.presupesto - precio
+          
+           this.presupuesto=this.presupuesto - precio
        }
 
         this.obtenerUsuario=function(){
@@ -222,9 +242,13 @@ function Ficha(nombre){
        }
        this.asignarCasilla=function(casilla){
           //document.writeln('asignada')
-           //document.writeln('El usuario '+this.usuario.nombre+' ha caido en la casilla '+casilla.tema.nombre)
+           console.log('El usuario '+this.usuario.nombre+' ha caido en la casilla '+casilla.tema.nombre)
            this.casilla=casilla
-          if(casilla.tema instanceof Calle) casilla.tema.estado.accion
+           if(casilla.tema instanceof Salida)this.presupuesto=this.presupuesto+200
+          if(casilla.tema instanceof Calle || casilla.tema instanceof Estacion){
+            console.log(casilla.tema.estado.nombre)
+            casilla.tema.estado.accion(this,casilla.tema)
+          } 
 
          // return'El usuario '+this.usuario.nombre+' ha caido en la casilla '+casilla.tema.nombre   
        }
@@ -235,7 +259,7 @@ function Jugador(nombre,presupuesto,juego){
      this.nombre=nombre
      this.juego=juego
      this.posicion=0
-     this.volverTirar=1
+     this.volverTirar=0
      
     
     this.comprarPropiedad=function(){
@@ -251,9 +275,10 @@ function Jugador(nombre,presupuesto,juego){
     
 
      this.lanzarDosDados=function(){
-        var numero=juego.obtenerDado().calcularNumero()
+       return this.juego.fase.lanzarDosDados(this)
+        /*var numero=juego.obtenerDado().calcularNumero()
         var numero2=juego.obtenerDado().calcularNumero()
-      this.volverTirar=1
+      
       if(this.volverTirar>0){
         this.posicion=this.posicion+numero+numero2
         if(this.posicion>=40)this.posicion=this.posicion-40
@@ -267,10 +292,14 @@ function Jugador(nombre,presupuesto,juego){
             juego.buscarJugador(this.nombre).asignarCasilla(juego.obtenerTablero().casillas[30])
             this.volverTirar=0
         }
+
+        if(this.volverTirar==0)juego.gestionTurnos()
         
         return numero+numero2 
     }
+        
         return 'No se puede tirar' 
+        */
      }
 
        this.lanzarDosDadosManual=function(numero,numero2){
@@ -297,6 +326,8 @@ function Jugador(nombre,presupuesto,juego){
      
 
 }
+
+
 function Propiedad(tipo,propietario,aumentoPrecio){
       this.tipo=tipo
       this.propietario=propietario
@@ -316,16 +347,24 @@ function Banco(dinero){
 }
 function Estacion(nombre,precio){
 
-    this.nombre = nombre
+  this.nombre = nombre
   this.precio = precio
-  this.propietario = new Jugador("nadie",0)
+ 
   this.titulo = new Titulo(precio)
-   this.agregarPropietario=function(propietario){
-      this.propietario = propietario
-  }
-  this.calcularPago=function(){
+  this.estado = new LibreEstacion()
+  
 
+  this.actualizarPrecioEstacion=function(ficha){
+     var precio
+       for(i=0;i<ficha.numeroPropiedades;i++){
+
+        if(ficha.propiedades[i] instanceof Estacion) {
+          
+          this.titulo.precioAlquiler = this.titulo.precioAlquiler + ficha.propiedades[i].titulo.precioAlquiler
+        }
+       }
   }
+
 }
 function Calle(nombre,precio,color,posicion){
     this.contadorPropiedades = 0
@@ -349,7 +388,6 @@ function Calle(nombre,precio,color,posicion){
 
 }
 
-
 function Normal(){
    this.nombre="Normal"
 }
@@ -371,6 +409,7 @@ function Creator(){
 
    function crearObjeto(){}
 }
+
 function CrearTablero(){}
 
 CrearTablero.prototype = new Creator;
@@ -389,17 +428,21 @@ function CrearJugador(){}
 
 CrearJugador.prototype = new Creator;
 CrearJugador.prototype.crearObjeto = function(nombre,juego) {
-  return new Jugador(nombre,150000,juego)
+  return new Jugador(nombre,1300,juego)
 }
 
 function Titulo(precioCompra){
      this.precioCompra=precioCompra
+     this.precioAlquiler=0
+     this.iniTitulo=function(){
      this.precioAlquiler=this.precioCompra/2
+     }
+
 
 }
 
 function Estado(){
-   
+   this.nombre='estado'
    this.comprar=function(){}
    this.functionAlquilar=function(){}
    this.accion=function(){}
@@ -411,8 +454,9 @@ Libre.prototype.comprar = function(ficha,propiedad) {
     ficha.comprarPropiedad(propiedad.titulo.precioCompra)
     propiedad.estado = new APagar()
 }
-APagar.prototype.accion = function(ficha, propiedad) {
-    document.write('El usuario puede comprar esta propiedad')
+Libre.prototype.accion = function(ficha, propiedad) {
+  
+    console.log('El usuario puede comprar esta propiedad')
 }
 
 function APagar(){}
@@ -422,11 +466,130 @@ APagar.prototype.comprar = function() {
     return 'Esta calle ya tiene propietario'
 }
 APagar.prototype.accion = function(ficha, propiedad) {
-    var pago=ficha.presupuesto-propiedad.titulo.precio
+    var pago=ficha.presupuesto=ficha.presupuesto-propiedad.titulo.precioAlquiler
     if(pago<0)
-    return 'El usuario no tiene dinero para pagar la estancia'
-    else return 'El usuario '+ficha.usuario.nombre+' ha pagado por su estancia en la calle '+propiedad.nombre+' '+pago
+    console.log('El usuario no tiene dinero para pagar la estancia')
+    else console.log('El usuario '+ficha.usuario.nombre+' ha pagado por su estancia en la calle '+propiedad.nombre+' '+pago)
 }
 
 function Hipotecado(){}
 Hipotecado.prototype = new Estado;
+
+
+function EstadoJuego(){
+
+
+}
+
+function EstadoEstacion(){
+  this.comprar=function(){}
+   this.functionAlquilar=function(){}
+   this.accion=function(){}
+
+}
+
+function LibreEstacion(){}
+LibreEstacion.prototype = new EstadoEstacion;
+LibreEstacion.prototype.comprar = function(ficha,propiedad) {
+    ficha.agregarPropiedad(propiedad)
+    ficha.comprarPropiedad(propiedad.titulo.precioCompra)
+    propiedad.actualizarPrecioEstacion(ficha)
+    propiedad.estado = new APagarEstacion()
+}
+LibreEstacion.prototype.accion = function(ficha, propiedad) {
+  
+    console.log('El usuario puede comprar esta estacion')
+}
+
+function APagarEstacion(){}
+APagarEstacion.prototype = new EstadoEstacion;
+APagarEstacion.prototype.comprar = function() {
+    
+    return 'Esta estacion ya tiene propietario'
+}
+APagarEstacion.prototype.accion = function(ficha, propiedad) {
+    var pago=ficha.presupuesto=ficha.presupuesto-propiedad.titulo.precioAlquiler
+    if(pago<0)
+    console.log('El usuario no tiene dinero para pagar la estancia')
+    else console.log('El usuario '+ficha.usuario.nombre+' ha pagado por su estancia en la estacion '+propiedad.nombre+' '+pago)
+}
+
+
+
+function Fases(){
+
+this.nuevoUsuario=function(usuario,juego){
+     console.log('Ya no se pueden añadir usuarios')
+
+     return -1
+
+   }
+    this.crearUsuario=function(usuarioNombre,juego){
+     console.log('Ya no se pueden crea usuarios')
+
+return -1
+   }
+
+   this.lanzarDosDados=function(usuario){
+     console.log('Aun no ha comenzado el juego')
+
+     return -1
+
+   }
+  this.asignarCasilla=function(casilla,ficha){
+          //document.writeln('asignada')
+           console.log('Aun no se pueden hacer transiciones ')
+
+           return -1
+          
+}
+}
+function Inicial(){}
+Inicial.prototype = new Fases;
+Inicial.prototype.nuevoUsuario=function(usuario,juego){
+     return juego.agregarFicha(usuario)
+
+   }
+Inicial.prototype.crearUsuario=function(usuarioNombre,juego){
+     return  juego.agregarFicha((new CrearJugador).crearObjeto(usuarioNombre,juego))
+
+   }
+
+
+
+function Jugar(){}
+Jugar.prototype = new Fases;
+Jugar.prototype.lanzarDosDados=function(usuario){
+        var numero=usuario.juego.obtenerDado().calcularNumero()
+        var numero2=usuario.juego.obtenerDado().calcularNumero()
+      
+      if(usuario.volverTirar>0){
+        usuario.posicion=usuario.posicion+numero+numero2
+        if(usuario.posicion>=40)usuario.posicion=usuario.posicion-40
+        usuario.juego.buscarJugador(usuario.nombre).asignarCasilla(usuario.juego.obtenerTablero().casillas[usuario.posicion])
+
+        if((numero+numero2)==12)usuario.volverTirar++;
+        else usuario.volverTirar=0;
+
+        if(usuario.volverTirar==3){
+         
+            usuario.juego.buscarJugador(usuario.nombre).asignarCasilla(usuario.juego.obtenerTablero().casillas[30])
+            usuario.volverTirar=0
+        }
+
+        if(usuario.volverTirar==0)usuario.juego.gestionTurnos()
+        
+        return numero+numero2 
+    }
+        
+        return 'No se puede tirar' 
+     }
+Jugar.prototype.asignarCasilla=function(casilla,ficha){
+          //document.writeln('asignada')
+           console.log('El usuario '+ficha.usuario.nombre+' ha caido en la casilla '+casilla.tema.nombre)
+           ficha.casilla=casilla
+           if(casilla.tema instanceof Salida)ficha.presupuesto=ficha.presupuesto+200
+          if(casilla.tema instanceof Calle || casilla.tema instanceof Estacion)
+            casilla.tema.estado.accion(ficha,casilla.tema)
+          
+}
