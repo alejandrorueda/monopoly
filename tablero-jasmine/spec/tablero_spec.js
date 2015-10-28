@@ -445,44 +445,7 @@ describe("Funciones calles",function(){
 
     })
 
-      it("Comprar todas las propiedades",function(){
-
-        var presupuestoInicial;
-        juego.iniJuego();
-        juego.crearUsuario('pepe');
-        juego.crearUsuario('jose');
-
-        ficha1 = juego.buscarJugador('pepe');
-        ficha2 = juego.buscarJugador('jose');
-        
-        presupuestoInicial=ficha1.presupuesto;
    
-       for(i=8;i<9;i++){
-         
-       // juego.tablero.casillas[i].tema.estado.accion();
-     
-        ficha1.asignarCasilla(juego.tablero.casillas[8]);
-      
-        juego.tablero.casillas[8].tema.titulo.iniTitulo();
-        ficha1.usuario.comprarPropiedad();
-         
-      }
-
-      expect(ficha1.numeroPropiedades).toEqual(22);
-       /* expect(ficha1.propiedades[0]).toEqual(juego.tablero.casillas[5].tema);
-        expect(presupuestoInicial-juego.tablero.casillas[5].tema.titulo.precioCompra).toEqual(ficha1.presupuesto);
-
-        if(juego.tablero.casillas[5].tema.estado instanceof APagarEstacion)
-        expect(0).toEqual(0);
-        else expect(0).toEqual(-1);
-
-        presupuestoInicial=ficha2.presupuesto;
-        ficha2.asignarCasilla(juego.tablero.casillas[5]);
-        expect(presupuestoInicial-juego.tablero.casillas[5].tema.titulo.precioAlquiler).toEqual(ficha2.presupuesto);*/
-
-
-
-    })
    
    
 })

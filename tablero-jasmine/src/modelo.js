@@ -1,4 +1,4 @@
-
+//underscore.js
 function Juego(){
    this.numeroFichasUtilizadas=0
    this.dado = new Dado()
@@ -176,9 +176,11 @@ function Impuesto(nombre,cantidad){
     this.nombre=nombre
     this.cantidad=cantidad
 }
-function Tarjeta(nombre,descripcion){
+function Tarjeta(nombre,descripcion,comando){
       this.nombre=nombre
       this.descripcion=descripcion
+      this.comando = comando
+
 } 
 
 
@@ -267,10 +269,28 @@ function Jugador(nombre,presupuesto,juego){
 
         ficha.casilla.tema.estado.comprar(ficha,ficha.casilla.tema)
              
-             return ficha.casilla.tema.nombre+" ha sido comprado"         
+                   
         }
 
+    this.comprarCasa=function(propiedad){
+      if(this.volverTirar==1){
+       var ficha = juego.buscarJugador(this.nombre);
+       var propiedades = _.filter(ficha.propiedades, function (aTema){
 
+           return aTema.nombre==propiedad;
+      });
+       
+       if(propiedades[0]!=undefined){
+            propiedades[0].estado.comprar(ficha,propiedades[0])
+       }
+       else console.log('No tienes esta propiedad')
+     }
+
+    else{
+      console.log('No es tu turno no puedes comprar casa')
+    }
+
+    }
         
     
 
@@ -378,6 +398,14 @@ function Calle(nombre,precio,color,posicion){
   this.titulo=new Titulo(this.precio)
   this.estado=new Libre()
 
+
+this.mismoColor=function(juego){
+     var colorFiltro=this.colorr
+  var colores = _.filter(juego.tablero.casillas, function (aTema){ 
+    return aTema.tema.colorr==colorFiltro;
+     }).length;
+   return colores
+  }
   this.agregarPropiedad=function(propiedad){
       this.propiedades[this.contadorPropiedades]=propiedad
       this.contadorPropiedades++;
@@ -434,8 +462,12 @@ CrearJugador.prototype.crearObjeto = function(nombre,juego) {
 function Titulo(precioCompra){
      this.precioCompra=precioCompra
      this.precioAlquiler=0
+     this.casas=0
+     this.numeroCallesColor=0
+     this.precioCasa=100+(precioCompra/4)
      this.iniTitulo=function(){
-     this.precioAlquiler=this.precioCompra/2
+     this.precioAlquiler=this.precioCompra/4
+     this.precioAlquiler=this.precioAlquiler+this.precioAlquiler*this.casas
      }
 
 
@@ -446,6 +478,7 @@ function Estado(){
    this.comprar=function(){}
    this.functionAlquilar=function(){}
    this.accion=function(){}
+   this.comprarCasa=function(){}
 }
 function Libre(){}
 Libre.prototype = new Estado;
@@ -453,24 +486,104 @@ Libre.prototype.comprar = function(ficha,propiedad) {
     ficha.agregarPropiedad(propiedad)
     ficha.comprarPropiedad(propiedad.titulo.precioCompra)
     propiedad.estado = new APagar()
+    propiedad.estado.propietario=ficha
+    console.log(propiedad.nombre+' '+'ha sido comprada')
+    propiedad.titulo.iniTitulo()
 }
 Libre.prototype.accion = function(ficha, propiedad) {
   
-    console.log('El usuario puede comprar esta propiedad')
+    console.log('El usuario puede comprar esta propiedad por '+propiedad.titulo.precioCompra)
 }
 
-function APagar(){}
-APagar.prototype = new Estado;
-APagar.prototype.comprar = function() {
-    
-    return 'Esta calle ya tiene propietario'
+function APagar(){
+  this.propietario
 }
+APagar.prototype = new Estado;
+APagar.prototype.comprar = function(ficha,propiedad) {
+    
+var callesGrupo = _.filter(ficha.propiedades, function (aTema){ 
+    return aTema.colorr==propiedad.colorr;
+}).length;
+
+if(this.propietario==ficha){
+    if(callesGrupo==propiedad.mismoColor(ficha.usuario.juego)){
+   //this.comprarCasa(ficha,propiedad)
+   propiedad.estado = new Grupo()
+   console.log('ha comprar casa')
+   propiedad.estado.comprar(ficha,propiedad)
+ }else
+  console.log('Ya has comprado esta calle pero no puedes aun comprar casa')
+}
+else
+   console.log('Esta calle ya tiene propietario')
+}
+/*APagar.prototype.comprarCasa = function(ficha,propiedad) {
+    
+var callesGrupo = _.filter(ficha.propiedades, function (aTema){ 
+    return aTema.colorr==propiedad.colorr;
+}).length;
+ console.log(callesGrupo+' '+propiedad.mismoColor(ficha.usuario.juego))
+if(callesGrupo==propiedad.mismoColor(ficha.usuario.juego)){
+  if((ficha.presupuesto-propiedad.titulo.precioCasa)>0){
+
+  ficha.presupuesto=ficha.presupuesto-propiedad.titulo.precioCasa
+  propiedad.titulo.casas++;
+  console.log('El usuario compra una casa')
+  }
+  else console.log('No tienes suficiente dinero para una casa')
+}
+else
+   console.log('Aun no tienes todas las calles del grupo')
+}*/
 APagar.prototype.accion = function(ficha, propiedad) {
+
+
+if(this.propietario!=ficha){
     var pago=ficha.presupuesto=ficha.presupuesto-propiedad.titulo.precioAlquiler
+    this.porpietario+=propiedad.titulo.precioAlquiler
     if(pago<0)
     console.log('El usuario no tiene dinero para pagar la estancia')
     else console.log('El usuario '+ficha.usuario.nombre+' ha pagado por su estancia en la calle '+propiedad.nombre+' '+pago)
+
+  }
+else console.log('Eres su propietario')
 }
+
+
+function Grupo(){
+   
+   this.comprar=function(ficha,propiedad) {
+
+  if((ficha.presupuesto-propiedad.titulo.precioCasa)>0){
+
+  ficha.presupuesto=ficha.presupuesto-propiedad.titulo.precioCasa
+  propiedad.titulo.casas++
+  propiedad.titulo.iniTitulo()
+  console.log('El usuario compra una casa')
+  }
+  else console.log('No tienes suficiente dinero para una casa')
+}
+
+ this.accion=function(ficha,propiedad){
+
+   
+if(this.propietario!=ficha){
+    var pago=ficha.presupuesto=ficha.presupuesto-propiedad.titulo.precioAlquiler
+    this.porpietario+=propiedad.titulo.precioAlquiler
+    if(pago<0)
+    console.log('El usuario no tiene dinero para pagar la estancia')
+    else console.log('El usuario '+ficha.usuario.nombre+' ha pagado por su estancia en la calle '+propiedad.nombre+' '+pago)
+
+  }
+else console.log('Eres su propietario')
+
+ }
+
+}
+
+
+
+
 
 function Hipotecado(){}
 Hipotecado.prototype = new Estado;
@@ -544,7 +657,10 @@ return -1
           
 }
 }
-function Inicial(){}
+function Inicial(){
+  this.nombre='Fase Inicial'
+}
+
 Inicial.prototype = new Fases;
 Inicial.prototype.nuevoUsuario=function(usuario,juego){
      return juego.agregarFicha(usuario)
@@ -557,7 +673,9 @@ Inicial.prototype.crearUsuario=function(usuarioNombre,juego){
 
 
 
-function Jugar(){}
+function Jugar(){
+  this.nombre='Fase Jugar'
+}
 Jugar.prototype = new Fases;
 Jugar.prototype.lanzarDosDados=function(usuario){
         var numero=usuario.juego.obtenerDado().calcularNumero()
@@ -592,4 +710,55 @@ Jugar.prototype.asignarCasilla=function(casilla,ficha){
           if(casilla.tema instanceof Calle || casilla.tema instanceof Estacion)
             casilla.tema.estado.accion(ficha,casilla.tema)
           
+}
+
+
+
+function Caja(){
+   this.tarjetas=[]
+
+}
+
+function Comando(){
+
+   this.ejecutar=function(){}
+}
+
+function Avanzar(posiciones){
+   this.posiciones=posiciones
+   this.ejecutar=function(ficha){
+       ficha.posicion=ficha.posicion+this.posiciones
+        if(ficha.posicion>=40)ficha.posicion=ficha.posicion-40
+        ficha.asignarCasilla(ficha.usuario.juego.obtenerTablero().casillas[ficha.posicion])
+        console.log('Avanzas '+this.posiciones+' posiciones hasta la casilla '+ficha.posicion+' '+ficha.usuario.juego.obtenerTablero().casillas[ficha.posicion].tema.nombre)
+   }
+}
+
+function Retroceder(posiciones){
+   this.posiciones=posiciones
+   this.ejecutar=function(ficha){
+       ficha.posicion=ficha.posicion-this.posiciones
+        if(ficha.posicion<0)ficha.posicion=ficha.posicion+40
+        ficha.asignarCasilla(ficha.usuario.juego.obtenerTablero().casillas[ficha.posicion])
+        console.log('Retocedes '+this.posiciones+' posiciones hasta la casilla '+ficha.posicion+' '+ficha.usuario.juego.obtenerTablero().casillas[ficha.posicion].tema.nombre)
+   }
+}
+
+function Multa(cantidad){
+    this.cantidad=cantidad
+    this.ejecutar=function(ficha){
+        ficha.presupuesto=ficha.presupuesto-this.cantidad
+        if(ficha.presupuesto<0){
+
+        }
+        console.log('Has recibido una multa de '+this.cantidad)
+    }
+
+}
+
+Avanzar.prototype = new Comando
+Avanzar.prototype.ejecutar = function(ficha){
+
+   ficha.posicion+=this.posicion
+
 }
