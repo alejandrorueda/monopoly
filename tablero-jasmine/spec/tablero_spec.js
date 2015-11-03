@@ -90,7 +90,7 @@ describe("Monopoly",function(){
           expect(tab.casillas[29].obtenerTema().nombre).toEqual('Plaza de Espana');
           expect(tab.casillas[29].obtenerTema().colorr).toEqual('amarillo'); 
 
-          expect(tab.casillas[30].obtenerTema().nombre).toEqual('Carcel');
+          expect(tab.casillas[30].obtenerTema().nombre).toEqual('Ir a la carcel');
 
           expect(tab.casillas[31].obtenerTema().nombre).toEqual('Puerta del Sol');
           expect(tab.casillas[31].obtenerTema().colorr).toEqual('verde'); 
@@ -157,7 +157,7 @@ describe("Monopoly",function(){
             for(i=0;i<6;i++){
                juego.crearUsuario('usuario'+i);
             }
-            expect(juego.crearUsuario('usuario7')).toEqual('Ya estan todas las fichas asignadas');
+            expect(juego.crearUsuario('usuario7')).toEqual(-1);
             var colores=' ';
             for(i=0;i<6;i++){
                var ficha;
@@ -179,6 +179,7 @@ describe("Monopoly",function(){
                juego.iniJuego();
         
                juego.crearUsuario('usuario');
+               juego.crearUsuario('usuario2');
                var numeroDado;
               juego.empezar();
               juego.buscarJugador('usuario').usuario.volverTirar=1;
@@ -193,6 +194,7 @@ describe("Monopoly",function(){
                juego.iniJuego();
 
                juego.crearUsuario('usuario');
+               juego.crearUsuario('usuario2');
                juego.empezar();
                var posicion,numeroDado,nuevaCasilla,total;
                juego.buscarJugador('usuario').usuario.volverTirar=1;
@@ -208,14 +210,18 @@ describe("Monopoly",function(){
                juego.iniJuego();
 
                juego.crearUsuario('usuario');
+               juego.crearUsuario('usuario2');
                juego.empezar();
                var posicion=0,numeroDado,nuevaCasilla,total;
                
                for(k=0;k<40;k++){
-               juego.buscarJugador('usuario').usuario.volverTirar=1;
-                 juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDados();
+               //juego.buscarJugador('usuario').usuario.volverTirar=1;
+                         juego.buscarJugador('usuario').obtenerUsuario().lanzarDosDados();
+                  juego.buscarJugador('usuario').obtenerUsuario().pasarTurno();
+                 juego.buscarJugador('usuario2').obtenerUsuario().lanzarDosDados();
+                 juego.buscarJugador('usuario2').obtenerUsuario().pasarTurno();
 
-                 if(posicion==juego.buscarJugador('usuario').casilla.posicion)expect(0).toEqual(-1);
+                 if(posicion==juego.buscarJugador('usuario').casilla.posicion)expect(posicion).toEqual(juego.buscarJugador('usuario').casilla.posicion);
 
                  posicion = juego.buscarJugador('usuario').casilla.posicion;
                  expect(posicion).toBeLessThan(40);
@@ -228,6 +234,7 @@ describe("Monopoly",function(){
                juego.iniJuego();
 
                juego.crearUsuario('usuario');
+               juego.crearUsuario('usuario2');
                var posicion=0,numeroDado,nuevaCasilla,total;
                juego.empezar();
                
@@ -315,7 +322,7 @@ juego.empezar();
         do{
         valor=ficha1.usuario.lanzarDosDados()
         }while(valor==12);
-        
+        ficha1.usuario.pasarTurno();
    
         expect(ficha1.usuario.lanzarDosDados()).toEqual('No se puede tirar' );
 
@@ -326,6 +333,7 @@ juego.empezar();
         }while(valor==12);
 
         expect(ficha2.usuario.lanzarDosDados()).toEqual('No se puede tirar' );
+        ficha2.usuario.pasarTurno();
         expect(ficha1.usuario.lanzarDosDados()).toBeGreaterThan(1);
 
      })
@@ -340,11 +348,9 @@ describe("Funciones calles",function(){
 
         ficha1 = juego.buscarJugador('pepe');
         ficha2 = juego.buscarJugador('jose');
-        
+        juego.empezar();
         presupuestoInicial=ficha1.presupuesto;
-     
-       
-        juego.tablero.casillas[23].tema.estado.accion();
+
         ficha1.asignarCasilla(juego.tablero.casillas[23]);
       
         juego.tablero.casillas[23].tema.titulo.iniTitulo();
@@ -364,12 +370,136 @@ describe("Funciones calles",function(){
 
      })
 
-   it("Casilla salida 200 pelotis",function(){
+
+    it("Comprar y alquiler Casas y hoteles",function(){
       var presupuestoInicial;
         juego.iniJuego();
         juego.crearUsuario('pepe');
         juego.crearUsuario('jose');
 
+        ficha1 = juego.buscarJugador('pepe');
+        ficha2 = juego.buscarJugador('jose');
+        juego.empezar();
+        presupuestoInicial=ficha1.presupuesto;
+
+        ficha1.asignarCasilla(juego.tablero.casillas[1]);
+      
+        juego.tablero.casillas[1].tema.titulo.iniTitulo();
+        ficha1.usuario.comprarPropiedad();
+        expect(ficha1.propiedades[0]).toEqual(juego.tablero.casillas[1].tema);
+        expect(presupuestoInicial-juego.tablero.casillas[1].tema.titulo.precioCompra).toEqual(ficha1.presupuesto);
+
+        if(juego.tablero.casillas[1].tema.estado instanceof APagar)
+        expect(0).toEqual(0);
+        else expect(0).toEqual(-1);
+
+        presupuestoInicial=ficha2.presupuesto;
+        ficha2.asignarCasilla(juego.tablero.casillas[1]);
+        expect(presupuestoInicial-juego.tablero.casillas[1].tema.titulo.precioAlquiler).toEqual(ficha2.presupuesto);
+
+        ficha1.asignarCasilla(juego.tablero.casillas[3]);
+        ficha1.usuario.comprarPropiedad();
+        expect(juego.tablero.casillas[3].tema.titulo.casas).toEqual(0)
+
+        ficha1.asignarCasilla(juego.tablero.casillas[1]);
+        ficha1.usuario.comprarPropiedad();
+
+        expect(juego.tablero.casillas[1].tema.titulo.casas).toEqual(1)
+
+        ficha1.usuario.comprarPropiedad();
+        expect(juego.tablero.casillas[1].tema.titulo.casas).toEqual(1)
+
+   
+        ficha1.asignarCasilla(juego.tablero.casillas[3]);
+        ficha1.usuario.comprarPropiedad();
+        ficha1.usuario.comprarPropiedad();
+        ficha1.usuario.comprarPropiedad();
+        ficha1.usuario.comprarPropiedad();
+        expect(juego.tablero.casillas[3].tema.titulo.casas).toEqual(4)
+         
+        ficha1.usuario.lanzarDosDados();
+        ficha1.usuario.pasarTurno();
+
+        ficha1.usuario.comprarCasa('Plaza Lavapies');
+        expect(juego.tablero.casillas[3].tema.titulo.casas).toEqual(4);
+
+        ficha1.usuario.comprarCasa('Ronda de Valencia');
+        expect(juego.tablero.casillas[1].tema.titulo.casas).toEqual(1);
+        
+        ficha2.usuario.lanzarDosDados();
+        ficha2.usuario.pasarTurno();
+
+         ficha1.usuario.comprarCasa('Ronda de Valencia');
+         ficha1.usuario.comprarCasa('Ronda de Valencia');
+          ficha1.usuario.comprarCasa('Ronda de Valencia');
+         expect(juego.tablero.casillas[1].tema.titulo.casas).toEqual(4);
+
+
+
+     })
+
+  it("Salir de la carcel",function(){
+      var presupuestoInicial;
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        juego.crearUsuario('jose');
+
+        ficha1 = juego.buscarJugador('pepe');
+        ficha2 = juego.buscarJugador('jose');
+        juego.empezar();
+        presupuestoInicial=ficha1.presupuesto;
+
+        ficha1.asignarCasilla(juego.tablero.casillas[30]);
+        expect(ficha1.usuario.lanzarDosDados()).toEqual('No se puede tirar');
+
+        ficha1.usuario.pasarTurno();
+        ficha2.usuario.lanzarDosDados();
+        ficha2.usuario.pasarTurno();
+        expect(ficha1.usuario.lanzarDosDados()).toEqual('No se puede tirar');
+        ficha1.usuario.pasarTurno();
+        ficha2.usuario.lanzarDosDados();
+        ficha2.usuario.pasarTurno();
+        expect(ficha1.usuario.lanzarDosDados()).toEqual('No se puede tirar');
+        ficha1.usuario.pasarTurno();
+        ficha2.usuario.lanzarDosDados();
+        ficha2.usuario.pasarTurno();
+        expect(ficha1.usuario.lanzarDosDados()).toBeGreaterThan(1);
+        expect(ficha1.presupuesto).toBeGreaterThan(1450);
+
+
+        ficha1.asignarCasilla(juego.tablero.casillas[30]);
+        ficha1.usuario.pagarCarcel();
+        ficha1.usuario.pasarTurno();
+        ficha2.usuario.lanzarDosDados();
+        ficha2.usuario.pasarTurno();
+        expect(ficha1.usuario.lanzarDosDados()).toBeGreaterThan(1);
+     })
+
+  it("Obtener Tarjeta",function(){
+      var presupuestoInicial;
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        juego.crearUsuario('jose');
+
+        ficha1 = juego.buscarJugador('pepe');
+        ficha2 = juego.buscarJugador('jose');
+        juego.empezar();
+        presupuestoInicial=ficha1.presupuesto;
+
+        ficha1.asignarCasilla(juego.tablero.casillas[7]);
+        var tarjeta=ficha1.usuario.sacarTarjeta();
+        expect(tarjeta.comando).toBeDefined();
+        
+
+     })
+
+
+   it("Casilla salida 200 pelotis",function(){
+      var presupuestoInicial;
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        juego.crearUsuario('jose');
+        juego.empezar();
         ficha1 = juego.buscarJugador('pepe');
         ficha2 = juego.buscarJugador('jose');
         
@@ -388,7 +518,7 @@ describe("Funciones calles",function(){
         juego.iniJuego();
         juego.crearUsuario('pepe');
         juego.crearUsuario('jose');
-
+        juego.empezar();
         ficha1 = juego.buscarJugador('pepe');
         ficha2 = juego.buscarJugador('jose');
         
@@ -426,11 +556,31 @@ describe("Funciones calles",function(){
         expect(ficha1).toBeDefined();
         juego.empezar();
 
-        expect(juego.crearUsuario('paco')).toEqual(-1);
+        expect(juego.crearUsuario('paco')).toEqual(0);
+
+        juego.empezar();
+
+        expect(juego.crearUsuario('paco2')).toEqual(-1);
+
 
     })
 
      it("Fase del tablero Jugar",function(){
+
+        juego.iniJuego();
+        juego.crearUsuario('pepe');
+        juego.crearUsuario('jose');
+
+        ficha1 = juego.buscarJugador('pepe');
+        expect(ficha1).toBeDefined();
+        expect(ficha1.usuario.lanzarDosDados()).toEqual(-1);
+        juego.empezar();
+        expect(ficha1.usuario.lanzarDosDados()).toBeGreaterThan(1);
+
+
+    })
+
+       it("Eliminar del juego",function(){
 
         juego.iniJuego();
         juego.crearUsuario('pepe');
