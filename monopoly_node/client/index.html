@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Monopoly</title>
+<meta name="viewport" content="width=device-width"/>
+<meta name="keywords" content="free templates, website templates, CSS, XHTML" />
+<meta name="description" content="Simple Gray - Professional free XHTML/CSS template provided by templatemo.com" />
+<link href="/public/templatemo_style.css" rel="stylesheet" type="text/css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://raw.github.com/malsup/blockui/master/jquery.blockUI.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+
+<script language="javascript" type="text/javascript">
+
+function clearText(field)
+{
+    if (field.defaultValue == field.value) field.value = '';
+    else if (field.value == '') field.value = field.defaultValue;
+}
+</script>
+
+<div id="dialogo2" class="ventana"  title="Dialogo no modal">  
+</div>
+
+ <div id='dialog' title='dialog simple' > <p color="#FFFFFF" id="subastaa">Subasta</p></div>
+ <div id='dialog3' title='dialog simple' > <p color="#FFFFFF" id="notificacion">Notificacion</p></div>
+
+<script type="text/javascript">
+        $(function () {
+        $( '#dialog' ).dialog({
+            autoOpen: false,
+            show: 'blind',
+            hide: 'explode',
+            modal: true
+            });
+        });
+
+         $(function () {
+        $( '#dialog3' ).dialog({
+            autoOpen: false,
+            show: 'blind',
+            hide: 'explode',
+            modal: true
+            });
+        });
+
+
+       /* $(document)
+        .ajaxStart(function() {
+            $.blockUI({
+                theme: true,
+                baseZ: 2000
+            })
+        })
+        .ajaxStop($.unblockUI);*/
+</script>
+
+
+</head>
+<body>
+<div id="templatemo_header_wrapper">
+<!--  Free Web Templates by TemplateMo.com  -->
+  <div id="templatemo_header">
+    
+   	<div id="site_logo"></div>
+        
+		<div id="templatemo_menu">
+      		<div id="templatemo_menu_left"></div>
+            <ul id="botones_principio">
+                  <li id="pedir"><a href="#" class="current" id="pedirBtn">Nuevo</a></li>
+                <!--<li id="empezar"><a href="#" id="empezarBtn">Empezar</a></li>-->
+                  <li id="mostrar"><a href="#" id="mostrarBtn">Información</a></li>
+                  <li id="reinicio"><a href="#" id="resetBtn">Reset</a></li>
+                  <li id="salir"></li>
+                  <li><a href="#" class="last" id="meter"> <input type="text" id="nombre" width="10"/> </a></li>
+            </ul>   
+           	
+		</div> <!-- end of menu -->
+    
+    </div>  <!-- end of header -->
+</div> <!-- end of header wrapper -->
+
+<div id="templatemo_banner_wrapper">
+	<div id="templatemo_banner">
+    
+    	
+        	<div id="bloqueInformacion">
+                <p id="actualizarPresupuesto"></p>
+                <p id="tituloGrande" class="header_04">Lista de propiedades</p>
+                <div id="templatemo_banner_image" style="height:100px;overflow-y:scroll">
+                    <ul id="listaPropiedades">
+
+                                
+                    </ul>
+
+                </div>
+
+
+            	 <!--<img src="images/templatemo_image_01.jpg" alt="image 1" />-->
+            </div>
+        
+        
+        <div id="templatemo_banner_content">
+        	<div class="header_04">Informacion de juego</div>
+                <p id="informacion"></p>
+           
+        </div>	
+    
+    	<div class="cleaner"></div>
+    </div> <!-- end of banner -->
+</div> <!-- end of banner wrapper -->
+
+<div id="templatemo_content_wrapper">
+	<div id="templatemo_content">
+    
+    
+    	<div id="column_w530">
+            <canvas height="720" width="720" id="micanvas"></canvas>
+
+        	<!--
+            <div class="header_02">Welcome to our WEBSITE!</div>
+            
+            <p class="em_text">Simple Gray is a professional XHTML/CSS layout provided by <a href="http://www.templatemo.com" target="_parent">templatemo.com</a> for free of charge. You can use this template for any purpose. Credit goes to <a href="http://www.photovaco.com" target="_blank">Free Photos</a> for photos.</p>
+            
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam a justo dolor. Duis in tincidunt lorem. Nunc et tellus nisi. Nulla non velit lectus. Morbi luctus ullamcorper felis, non gravida neque congue sit amet.</p>
+            
+            <div class="margin_bottom_20"></div>
+            
+            <ul class="content_list_01">
+                <li>Integer tempor, libero quis laoreet dapibus, quam mauris hendrerit  urna, vel feugiat dolor lectus non velit. Fusce at nisl libero, ac  fringilla risus.</li>
+                <li>Proin non velit nec enim volutpat euismod. Phasellus lorem velit, porttitor non iaculis in, euismod a metus. Nullam orci odio, dignissim a egestas ac, sollicitudin in quam.</li>
+            </ul>
+            
+            <div class="margin_bottom_20"></div>           
+            
+            <div class="content_section_01">
+            	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam a justo dolor. Duis in tincidunt lorem. Nunc et tellus nisi. Nulla non velit lectus. Morbi luctus ullamcorper felis, non gravida neque congue sit amet. Nam nec mi metus, ac elementum velit. Etiam vel arcu velit, eget consequat risus. 
+            </div>
+            -->
+            
+           
+            
+            <div class="cleaner"></div>
+        </div>
+        
+        <div id="column_w300">
+        
+        	<div class="header_03">Acciones</div>
+            
+            <div class="column_w300_section_01">
+            <!--    <div class="news_image_wrapper">
+                    <img src="images/templatemo_image_02.jpg" alt="image" />
+                </div>
+             -->   
+                <div class="news_content" id="tituloCallec">
+                    <!--<button id="lanzarBtn">Lanzar dado</button>
+                -->
+                </div>
+                                
+                <div class="cleaner"></div>
+            </div>
+
+            <div class="column_w300_section_01">
+            <!--	<div class="news_image_wrapper">
+                	<img src="images/templatemo_image_02.jpg" alt="image" />
+                </div>
+             -->   
+                <div class="news_content" id="lanzar">
+                	<!--<button id="lanzarBtn">Lanzar dado</button>
+                -->
+				</div>
+                                
+                <div class="cleaner"></div>
+            </div>
+            
+            <div class="column_w300_section_01 even_color">
+            	
+                <div class="news_content" id="comprar">
+                	
+                   <!-- <div class="header_04"><a href="#">Nam dictum pellentesque</a></div>
+                    <p>Nam ultricies cursus enim, non aliquet orci lacinia ac. Etiam lobortis adipiscing.</p>
+                -->
+				</div>
+                                
+                <div class="cleaner"></div>
+            </div>
+            
+            <div class="column_w300_section_01">
+            	
+                
+                <div class="news_content" id="pasar">
+                
+                    
+				</div>
+                                
+                <div class="cleaner"></div>
+            </div>
+
+            <div class="column_w300_section_01">
+               <!-- <div class="news_image_wrapper">
+                    <img src="images/templatemo_image_04.jpg" alt="image" />
+                </div>
+                -->
+                <div class="news_content" id="edificar">
+               
+   
+                </div>
+                                
+                <div class="cleaner"></div>
+            </div>
+
+            <div class="column_w300_section_01">
+               <!-- <div class="news_image_wrapper">
+                    <img src="images/templatemo_image_04.jpg" alt="image" />
+                </div>
+                -->
+                <div class="news_content" id="sacarTarjeta">
+               
+   
+                </div>
+                                
+                <div class="cleaner"></div>
+            </div>
+            
+            <div class="column_w300_section_01">
+               <!-- <div class="news_image_wrapper">
+                    <img src="images/templatemo_image_04.jpg" alt="image" />
+                </div>
+                -->
+                <div class="news_content" id="vender">
+               
+   
+                </div>
+                                
+                <div class="cleaner"></div>
+            </div>
+            
+            <div class="column_w300_section_01">
+               <!-- <div class="news_image_wrapper">
+                    <img src="images/templatemo_image_04.jpg" alt="image" />
+                </div>
+                -->
+                <div class="news_content" id="listaEnVenta">
+             
+   
+                </div>
+                                
+                <div class="cleaner"></div>
+            </div>
+
+         <div class="column_w300_section_01">
+               <!-- <div class="news_image_wrapper">
+                    <img src="images/templatemo_image_04.jpg" alt="image" />
+                </div>
+                -->
+                <div class="news_content" id="nada">
+             
+   
+                </div>
+                                
+                <div class="cleaner"></div>
+            </div>
+
+            <div class="column_w300_section_01">
+               <!-- <div class="news_image_wrapper">
+                    <img src="images/templatemo_image_04.jpg" alt="image" />
+                </div>
+                -->
+                <div class="news_content" id="solicitud">
+               
+   
+                </div>
+                                
+                <div class="cleaner"></div>
+            </div>
+
+
+            <div class="cleaner"></div>
+        </div>
+    
+    	<div class="cleaner"></div>
+    </div> <!-- end of content wrapper -->
+</div> <!-- end of content wrapper -->
+
+<div id="templatemo_footer_wrapper">
+
+	<div id="templatemo_footer">
+    	
+       
+        
+        <div class="margin_bottom_20"></div>
+        Copyright © 2048 <a href="#">Your Company Name</a> | <a href="http://www.iwebsitetemplate.com" target="_parent">Website Templates</a> by <a href="http://www.templatemo.com" target="_parent">Free CSS Templates</a>
+        <div class="cleaner"></div>
+    </div> <!-- end of footer -->
+    <!--  Free CSS Templates by TemplateMo.com  -->
+</div> <!-- end of footer -->
+<div align=center>This template  downloaded form <a href='http://all-free-download.com/free-website-templates/'>free website templates</a></div>
+<script src="../client/cliente-juego.js"></script>
+    <!--<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>-->
+    <script src="./client/jquery.cookie.js"></script>
+    <script>
+    $(document).ready(function(){
+        //$("#lanzarBtn").hide();
+  
+     });
+         pedirFicha();
+    </script>
+  
+</body>
+</html>
